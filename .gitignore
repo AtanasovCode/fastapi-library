@@ -1,0 +1,6 @@
+# PyCharm / IntelliJ settings
+.idea/
+*.iml
+
+.venv
+*.db
