@@ -1,6 +1,22 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
+from database.database import engine, Base
+from database.seed import seed
+# Routers
+from web.book_router import router as book_api_router
 
-app = FastAPI()
+
+
+Base.metadata.create_all(bind=engine)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    seed()
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
+app.include_router(book_api_router)
 
 
 @app.get("/")
