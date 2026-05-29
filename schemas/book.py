@@ -1,15 +1,20 @@
 from pydantic import BaseModel
 from typing import Optional
+from schemas.category import CategorySchema
+from schemas.author import AuthorSchema
 
 
 class BookSchema(BaseModel):
     id: int
-    title: str
+    name: str
     pages: int
     price: float
     quantity: int
     author: AuthorSchema
     category: CategorySchema
+
+    class Config:
+        from_attributes=True
 
 
 class BookCreate(BaseModel):
