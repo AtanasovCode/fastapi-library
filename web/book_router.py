@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database.database import get_db
 from service import book as books
@@ -15,19 +15,27 @@ async def list_all(db: Session = Depends(get_db)):
 
 @router.get("/{book_id}", response_model=BookSchema)
 async def find_by_id(book_id: int, db: Session = Depends(get_db)):
-    return books.find_by_id(db, book_id)
+    db_book = books.find_by_id(db, book_id)
+
+    if db_book is None:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail=f"Book with id {book_id} not found"
+        )
+
+    return db_book
 
 
-@router.post("/create", response_model=BookSchema)
+@router.post("/", response_model=BookSchema)
 async def save(book_create: BookCreate, db: Session = Depends(get_db)):
     return books.save(db, book_create)
 
 
-@router.put("/update/book/{book_id}", response_model=BookSchema)
+@router.put("/{book_id}", response_model=BookSchema)
 async def update(book_update: BookUpdate, book_id: int, db: Session = Depends(get_db)):
     return books.update(db, book_update, book_id)
 
 
-@router.delete("/delete/{book_id}", response_model=BookSchema)
+@router.delete("/{book_id}", response_model=BookSchema)
 async def delete(book_id: int, db: Session = Depends(get_db)):
     return books.delete(db, book_id)
