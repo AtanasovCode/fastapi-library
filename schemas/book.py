@@ -18,7 +18,7 @@ class BookSchema(BaseModel):
 
 
 class BookCreate(BaseModel):
-    title: str
+    name: str
     pages: int
     price: float
     quantity: int
@@ -28,7 +28,7 @@ class BookCreate(BaseModel):
 
 
 class BookUpdate(BaseModel):
-    title: Optional[str] = None
+    name: Optional[str] = None
     pages: Optional[int] = None
     price: Optional[float] = None
     quantity: Optional[int] = None

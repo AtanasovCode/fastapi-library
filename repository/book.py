@@ -1,6 +1,50 @@
 from sqlalchemy.orm import Session
 from models.book import Book
+from schemas.book import BookCreate, BookUpdate
+from typing import Optional
 
 
 def list_all(db: Session):
     return db.query(Book).all()
+
+
+def find_by_id(db: Session, book_id: int):
+    return db.query(Book).filter(Book.id == book_id).first()
+
+
+def save(db: Session, book_create: BookCreate):
+    # Create new book
+    new_book = Book(**book_create.model_dump())
+
+    # Add it to the database
+    db.add(new_book)
+    db.commit()
+    db.refresh(new_book)
+    return new_book
+
+
+def update(db: Session, book_update: BookUpdate, book_id: int):
+    db_book = find_by_id(db, book_id)
+
+    if db_book is None:
+        return None
+
+    for key, value in (book_update.model_dump(exclude_unset=True).items()):
+        setattr(db_book, key, value)
+
+    db.add(db_book)
+    db.commit()
+    db.refresh(db_book)
+    return db_book
+
+
+
+def delete(db: Session, book_id: int):
+    db_book = find_by_id(db, book_id)
+
+    if not db_book:
+        return None
+
+    db.delete(db_book)
+    db.commit()
+    return db_book
