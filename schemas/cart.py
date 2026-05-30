@@ -2,6 +2,10 @@ from pydantic import BaseModel
 from schemas.book import BookSchema
 
 
+class CartItemCreate(BaseModel):
+    book_id: int
+    quantity: int
+
 
 class CartItemResponse(BaseModel):
     id: int

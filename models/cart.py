@@ -10,3 +10,21 @@ class Cart(Base):
 
 
     user = relationship("User", back_populates="cart")
+    items = relationship(
+        "CartItem",
+        back_populates="cart",
+        cascade="all, delete-orphan"
+    )
+
+
+
+class CartItem(Base):
+    __tablename__ = "cart_items"
+
+    id = Column(Integer, primary_key=True)
+    cart_id = Column(Integer, ForeignKey("carts.id"), nullable=False)
+    book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
+    quantity = Column(Integer, nullable=False, default=1)
+
+    cart = relationship("Cart", back_populates="items")
+    book = relationship("Book")
