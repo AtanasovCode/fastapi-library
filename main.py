@@ -5,6 +5,7 @@ from database.seed import seed
 # Routers
 from web.book_router import router as book_api_router
 from web.category_router import router as category_api_router
+from web.user_router import router as user_api_router
 
 
 
@@ -19,6 +20,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(book_api_router)
 app.include_router(category_api_router)
+app.include_router(user_api_router)
 
 
 @app.get("/")
