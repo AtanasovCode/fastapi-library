@@ -1,16 +1,16 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 from typing import Optional
 from schemas.cart import CartResponse
 
-
-class UserBase(BaseModel):
-    email: EmailStr
-
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
+    email: str
+    username: str
     password: str
 
-class UserResponse(UserBase):
+class UserResponse(BaseModel):
     id: int
+    email: str
+    username: str
     cart: Optional[CartResponse] = None
 
     class Config:
