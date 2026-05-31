@@ -36,9 +36,11 @@ def remove_item_from_cart(db: Session, cart_id: int, item_id: int):
         CartItem.id == item_id
     ).first()
 
-    if item:
-        db.delete(item)
-        db.commit()
+    if not item:
+        return None
+
+    db.delete(item)
+    db.commit()
     return item
 
 

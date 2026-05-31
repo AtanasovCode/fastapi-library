@@ -15,6 +15,10 @@ def add_item_to_cart(db: Session, cart_id: int, item_data: CartItemCreate):
     return carts.add_item_to_cart(db, cart_id, item_data)
 
 
+def remove_item_from_cart(db: Session, cart_id: int, item_id: int):
+    return carts.remove_item_from_cart(db, cart_id, item_id)
+
+
 def clear_cart(db: Session, cart_id: int):
     return carts.clear_cart(db, cart_id)
 
