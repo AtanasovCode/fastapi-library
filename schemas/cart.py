@@ -1,5 +1,13 @@
 from pydantic import BaseModel
-from schemas.book import BookSchema
+from schemas.user import UserResponse
+
+class CartItemScheme(BaseModel):
+    id: int
+    book_id: int
+    quantity: int
+
+    class Config:
+        from_attributes=True
 
 
 class CartItemCreate(BaseModel):
@@ -7,22 +15,14 @@ class CartItemCreate(BaseModel):
     quantity: int
 
 
-class CartItemResponse(BaseModel):
+class CartSchema(BaseModel):
     id: int
-    book_id: int
-    quantity: int
-    book: BookSchema
+    user: UserResponse
+    items: list[CartItemScheme] = []
 
     class Config:
         from_attributes = True
+
 
 class CartCreate(BaseModel):
     user_id: int
-
-class CartResponse(BaseModel):
-    id: int
-    user_id: int
-    items: list[CartItemResponse] = []
-
-    class Config:
-        from_attributes = True
