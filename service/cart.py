@@ -3,13 +3,26 @@ from repository import cart as carts
 from schemas.cart import CartCreate, CartItemCreate
 
 
-def create(db: Session, cart_create: CartCreate):
-    return carts.create(db, cart_create)
-
-
-def add_item_to_cart(db: Session, item_data: CartItemCreate, user_id: int):
-    return carts.add_item_to_cart(db, item_data, user_id)
-
-
 def get_cart_by_user_id(db: Session, user_id: int):
     return carts.get_cart_by_user_id(db, user_id)
+
+
+def create_cart(db: Session, user_id: int):
+    return carts.create_cart(db, user_id)
+
+
+def add_item_to_cart(db: Session, cart_id: int, item_data: CartItemCreate):
+    return carts.add_item_to_cart(db, cart_id, item_data)
+
+
+def clear_cart(db: Session, cart_id: int):
+    return carts.clear_cart(db, cart_id)
+
+
+def get_cart_items(db: Session, cart_id: int):
+    return carts.get_cart_items(db, cart_id)
+
+
+def buy_items(db: Session, cart_id: int):
+    return carts.buy_items(db, cart_id)
+
