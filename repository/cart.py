@@ -1,10 +1,17 @@
 from sqlalchemy.orm import Session
+from starlette.responses import JSONResponse
+
 from models.cart import Cart, CartItem
-from schemas.cart import CartCreate, CartItemCreate
+from models.book import Book
+from schemas.cart import CartItemCreate
 
 
-def create(db: Session, cart_create: CartCreate):
-    new_cart = Cart(**cart_create.model_dump())
+def get_cart_by_user_id(db: Session, user_id: int):
+    return db.query(Cart).filter(Cart.user_id == user_id).first()
+
+
+def create_cart(db: Session, user_id: int):
+    new_cart = Cart(user_id=user_id)
 
     db.add(new_cart)
     db.commit()
@@ -12,39 +19,56 @@ def create(db: Session, cart_create: CartCreate):
     return new_cart
 
 
-def add_item_to_cart(db: Session, item_data: CartItemCreate, user_id: int):
-    # Check if a user has a cart, if not create one
-    db_cart = db.query(Cart).filter(Cart.user_id == user_id).first()
-
-    if not db_cart:
-        cart_create = CartCreate(user_id=user_id)
-        db_cart = create(db, cart_create)
-
-    # Check to see if that item already exists in the cart
-    db_item = db.query(CartItem).filter(
-        CartItem.cart_id == db_cart.id,
-        CartItem.book_id == item_data.book_id
-    ).first()
-
-    # If the item exists, update the quantity
-    if db_item:
-        db_item.quantity += item_data.quantity
-        db.commit()
-        db.refresh(db_item)
-        return db_item
-
-    # If item does not exist, create it
+def add_item_to_cart(db: Session, cart_id: int, item_data: CartItemCreate):
     new_item = CartItem(
-        cart_id=db_cart.id,
-        book_id=item_data.book_id,
-        quantity=item_data.quantity
+        cart_id = cart_id,
+        **item_data.model_dump()
     )
-    # Add new item to database
+
     db.add(new_item)
     db.commit()
     db.refresh(new_item)
     return new_item
 
+def remove_item_from_cart(db: Session, cart_id: int, item_id: int):
+    item = db.query(CartItem).filter(
+        CartItem.cart_id == cart_id,
+        CartItem.id == item_id
+    ).first()
 
-def get_cart_by_user_id(db: Session, user_id: int):
-    return db.query(Cart).filter(Cart.user_id == user_id).first()
+    if item:
+        db.delete(item)
+        db.commit()
+    return item
+
+
+def clear_cart(db: Session, cart_id: int):
+    db.query(CartItem).filter(
+        CartItem.cart_id == cart_id
+    ).delete()
+    db.commit()
+
+
+
+def get_cart_items(db: Session, cart_id: int):
+    return db.query(CartItem).filter(
+        CartItem.cart_id == cart_id
+    ).all()
+
+
+def buy_items(db: Session, cart_id: int):
+    cart_items = get_cart_items(db, cart_id)
+
+    for item in cart_items:
+        book = db.query(Book).filter(
+            Book.id == item.book_id
+        ).first()
+        if not book or book.quantity < item.quantity:
+            raise ValueError("Insufficient stock for product")
+        book.quantity -= item.quantity
+
+    db.query(CartItem).filter(
+        CartItem.cart_id == cart_id
+    ).delete()
+
+    db.commit()
