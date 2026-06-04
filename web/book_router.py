@@ -36,6 +36,6 @@ async def update(book_update: BookUpdate, book_id: int, db: Session = Depends(ge
     return books.update(db, book_update, book_id)
 
 
-@router.delete("/{book_id}", response_model=BookSchema)
+@router.delete("/{book_id}")
 async def delete(book_id: int, db: Session = Depends(get_db)):
     return books.delete(db, book_id)
